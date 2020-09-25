@@ -4,7 +4,7 @@ import click
 import re
 from urllib.request import urlopen
 from colorama import init
-from bs4 import BeautifulSoup, SoupStrainer
+import bs4
 from retry import retry
 
 init()
@@ -48,7 +48,7 @@ URL_REGEX = re.compile(
 def file_parse(filepath):
     link_list = []
     with open(filepath, 'r') as file_object:
-        for link in BeautifulSoup(file_object.read(), "html.parser", parse_only=SoupStrainer('a')):
+        for link in bs4.BeautifulSoup(file_object.read(), "html.parser", parse_only=bs4.SoupStrainer('a')):
             if link.has_attr('href'):
                 link_list.append(link['href'])
     return link_list
@@ -60,7 +60,7 @@ def url_parse(base_link):
         req = urllib.request.Request(base_link, headers={'User-Agent': "Magic-Browser"})
         page = urlopen(req)
         html = page.read().decode("utf-8")
-        soup = BeautifulSoup(html, "html.parser")
+        soup = bs4.BeautifulSoup(html, "html.parser")
         for link in soup.find_all("a"):
             if link["href"] == '/':
                 link_list.append(base_link)
@@ -75,14 +75,17 @@ def url_parse(base_link):
 
 @retry(ConnectionError, tries=3, delay=2)
 def link_checker(link):
-    response = requests.head(link)
-    if response.status_code == 200:
-        click.secho('[GOOD]    ' + link, fg='green')
-    elif response.status_code == 404 or response.status_code == 400:
-        click.secho('[BAD]     ' + link, fg='red')
-    else:
-        click.secho('[UNKNOWN] ' + link, fg='white')
-    return response.status_code
+    try:
+        response = requests.head(link)
+        if response.status_code == 200:
+            click.secho('[GOOD]    ' + link, fg='green')
+        elif response.status_code == 404 or response.status_code == 400:
+            click.secho('[BAD]     ' + link, fg='red')
+        else:
+            click.secho('[UNKNOWN] ' + link, fg='white')
+        return response.status_code
+    except requests.exceptions.ConnectionError:
+        click.secho('[ERROR]   ' + link, fg='red')
 
 
 @click.command(context_settings={"ignore_unknown_options": True})
