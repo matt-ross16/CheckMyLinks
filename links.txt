@@ -1,65 +1,21 @@
-error-page.asp?e=400
-error-page.asp?e=401
-error-page.asp?e=402
-error-page.asp?e=403
-error-page.asp?e=404
-error-page.asp?e=405
-error-page.asp?e=406
-error-page.asp?e=407
-error-page.asp?e=408
-error-page.asp?e=409
-error-page.asp?e=410
-error-page.asp?e=411
-error-page.asp?e=412
-error-page.asp?e=413
-error-page.asp?e=414
-error-page.asp?e=415
-error-page.asp?e=416
-error-page.asp?e=417
-error-page.asp?e=420
-error-page.asp?e=422
-error-page.asp?e=423
-error-page.asp?e=424
-error-page.asp?e=429
-error-page.asp?e=431
-error-page.asp?e=450
-error-page.asp?e=500
-error-page.asp?e=501
-error-page.asp?e=502
-error-page.asp?e=503
-error-page.asp?e=504
-error-page.asp?e=505
-error-page.asp?e=506
-error-page.asp?e=507
-error-page.asp?e=509
-error-page.asp?e=510
-http://www.deadlinkcity.com/page-not-found.asp
-
-http://www.domaindoesnot.exist
-
-http://www.deadlinkcity.com/nosuchpage2.txt
-
-(301 redirection from http://www.deadlinkcity.com/default.asp?r=4)
-http://www.deadlinkcity.com/nonexistentpage.txt
-(302 redirection from http://www.deadlinkcity.com/default.asp?r=5)
-http://www.deadlinkcity.com/nosuchpage3.txt
-(double 301 redirection from http://www.deadlinkcity.com/default.asp?r=6
-and http://www.deadlinkcity.com/default.asp?r=44)
-http://www.deadlinkcity.com/nonexistentpage2.txt
-(double 302 redirection from http://www.deadlinkcity.com/default.asp?r=7
-and http://www.deadlinkcity.com/default.asp?r=55)
-http://www.deadlinkcity.com/disallowed/disallowed.html
-file is missing, but disallowed by robots.txt
-Scanners respecting robots.txt will not report this link.
-http://www.deadlinkcity.com/disallowed/nonexistent.html
-file is missing, allowed by robots.txt
-http://www.deadlinkcity.com/images/nosuchimage.png?r=0
-referenced in inline style
-http://www.deadlinkcity.com/images/nosuchimage.png?r=1
-referenced in HTML <style> element
-http://www.deadlinkcity.com/images/nosuchimage.png?r=2
-referenced in external stylesheet
-
+Skip to content
+ 
+Search…
+All gists
+Back to GitHub
+@AbdulMAbdi 
+@chrispinkney
+chrispinkney/index2.html
+Forked from humphd/urls.txt
+Last active 5 days ago • Report abuse
+1
+0
+ Code
+ Revisions 2
+ Stars 1
+<script src="https://gist.github.com/chrispinkney/069b09d2da5b9f7b73347d13ba3c32e7.js"></script>
+Planet Feed URLs
+index2.html
 <a href="https://wiki.cdot.senecacollege.ca/w/api.php?action=rsd">https://wiki.cdot.senecacollege.ca/w/api.php?action=rsd</a>
 <a href="http://zenit.senecac.on.ca/~chris.tyler/planet/">http://zenit.senecac.on.ca/~chris.tyler/planet/</a>
 <a href="http://www.wordpress.com">http://www.wordpress.com</a>
@@ -829,3 +785,20 @@ referenced in external stylesheet
 <a href="https://wiki.cdot.senecacollege.ca/w/index.php?title=Planet_CDOT_Feed_List&amp;oldid=147777">https://wiki.cdot.senecacollege.ca/w/index.php?title=Planet_CDOT_Feed_List&amp;oldid=147777</a>
 <a href="http://cdot.senecacollege.ca/">http://cdot.senecacollege.ca/</a>
 <a href="https://wiki.cdot.senecacollege.ca/w/index.php?title=Planet_CDOT_Feed_List&amp;mobileaction=toggle_view_mobile">https://wiki.cdot.senecacollege.ca/w/index.php?title=Planet_CDOT_Feed_List&amp;mobileaction=toggle_view_mobile</a>
+@AbdulMAbdi
+ 
+Leave a comment
+
+Attach files by dragging & dropping, selecting or pasting them.
+© 2020 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About

@@ -46,6 +46,7 @@ URL_REGEX = re.compile(
 
 
 def file_parse(filepath):
+    
     link_list = []
     with open(filepath, 'r') as file_object:
         for link in bs4.BeautifulSoup(file_object.read(), "html.parser", parse_only=bs4.SoupStrainer('a')):

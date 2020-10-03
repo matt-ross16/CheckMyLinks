@@ -29,6 +29,12 @@ And if it's a file you want checked for working links, use the
 
     python checkMyURL.py --parse_file <your file here>
 
+And if it's a file you want checked for working links and save the results for later viewing 
+use the
+--save_file option:
+
+    python checkMyURL.py --save_file <your file here>
+
     
 ## Features
 Based on the link that is passed to the program, either a GOOD,
