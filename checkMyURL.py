@@ -46,6 +46,7 @@ URL_REGEX = re.compile(
 
 
 def file_parse(filepath):
+    
     link_list = []
     with open(filepath, 'r') as file_object:
         for link in bs4.BeautifulSoup(file_object.read(), "html.parser", parse_only=bs4.SoupStrainer('a')):
@@ -77,22 +78,29 @@ def url_parse(base_link):
 def link_checker(link):
     try:
         response = requests.head(link)
+        responseString = ""
         if response.status_code == 200:
             click.secho('[GOOD]    ' + link, fg='green')
+            responseString = '[GOOD]    ' + link + '\r\n'
         elif response.status_code == 404 or response.status_code == 400:
             click.secho('[BAD]     ' + link, fg='red')
+            responseString = '[BAD]     ' + link + '\r\n'
         else:
             click.secho('[UNKNOWN] ' + link, fg='white')
-        return response.status_code
+            responseString = '[BAD]     ' + link + '\r\n'
+        return response.status_code , responseString 
     except requests.exceptions.ConnectionError:
         click.secho('[ERROR]   ' + link, fg='red')
+        responseString = '[BAD]     ' + link + '\r\n'
+        return responseString 
 
 
 @click.command(context_settings={"ignore_unknown_options": True})
 @click.option('--parse_url', is_flag=True, help="Will search the link provided for all broken links")
 @click.option('--parse_file', is_flag=True, help="Will parse the file provided for broken links")
+@click.option('--save_file', is_flag=True, help="Will parse the file provided for broken links and save results to text file")
 @click.argument('link')
-def main(parse_url, parse_file, link):
+def main(parse_url, parse_file, save_file,link):
     """
     A tool used to determine if a link provided is a valid link or not.
     Either provide the single link or the file needing parsing.
@@ -108,12 +116,20 @@ def main(parse_url, parse_file, link):
             link_checker(link_list[0])
         else:
             click.echo("No links on this page")
-    elif parse_file:
+    elif parse_file or save_file:
+        if save_file: 
+            f = open("results.txt", "w+")
         click.echo("Parsing file later")
         link_list = file_parse(link)
         for link in link_list:
             if str(link) != 'None':
-                link_checker(link)
+                result = link_checker(link)
+                if save_file:
+                    f.write(result[1])
+        if save_file: 
+            f.close()
+
+
     else:
         link_checker(link)
 
