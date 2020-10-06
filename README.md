@@ -6,7 +6,7 @@ For those times when you aren't sure if the link you have on hand
 actually exists, plug it into this handy tool and you will find the
 answer quickly!
 
-## Prequisitions
+## Prerequisites
 
 Before you begin, ensure that you have downloaded and installed Python to your
 machine:
