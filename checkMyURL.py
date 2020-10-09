@@ -2,6 +2,7 @@ import urllib
 import requests
 import click
 import re
+import sys
 from urllib.request import urlopen
 from colorama import init
 import bs4
@@ -45,63 +46,82 @@ URL_REGEX = re.compile(
     , re.UNICODE)
 
 
+# Takes a file passed to it, and passes the links within to link_checker
 def file_parse(filepath):
     link_list = []
-    with open(filepath, 'r') as file_object:
-        for link in bs4.BeautifulSoup(file_object.read(), "html.parser", parse_only=bs4.SoupStrainer('a')):
-            if link.has_attr('href'):
-                link_list.append(link['href'])
-    return link_list
+    try:
+        with open(filepath, 'r') as file_object:
+            for link in bs4.BeautifulSoup(file_object.read(), "html.parser", parse_only=bs4.SoupStrainer('a')):
+                if link.has_attr('href'):
+                    link_list.append(link['href'])
+        return link_list
+    except OSError:
+        click.secho('Not a valid file (perhaps try --parse_url)', fg='red')
+        error_code = 5
+        return error_code
 
 
+# Takes a link passed to it, and scrapes the webpage for links
 def url_parse(base_link):
     link_list = []
+    error_code = 0
     try:
-        if link_checker(base_link) == 200:
-            req = urllib.request.Request(base_link, headers={'User-Agent': "Magic-Browser"})
+        if link_checker(base_link)[1] == 200:
+            req = urllib.request.Request(base_link, headers={'User-Agent': 'Magic-Browser'})
             page = urlopen(req)
-            html = page.read().decode("utf-8")
-            soup = bs4.BeautifulSoup(html, "html.parser")
-            for link in soup.find_all("a"):
-                if link["href"] == '/':
+            html = page.read().decode('utf-8')
+            soup = bs4.BeautifulSoup(html, 'html.parser')
+            for link in soup.find_all('a'):
+                if link['href'] == '/':
                     link_list.append(base_link)
-                elif link["href"].startswith("/"):
-                    link_list.append(base_link[:-1] + link["href"])
-                elif link["href"].startswith("http"):
-                    link_list.append(link["href"])
+                elif link['href'].startswith('/'):
+                    link_list.append(base_link[:-1] + link['href'])
+                elif link['href'].startswith('http'):
+                    link_list.append(link['href'])
                 else:
-                    link_list.append(base_link + link["href"])
-            return link_list
+                    link_list.append(base_link + link['href'])
+            return error_code, link_list
+        else:
+            click.secho('This link is broken', fg='red')
+            error_code = 4
+            return error_code
     except requests.exceptions.ConnectionError:
-        raise Exception('This is not a valid link')
+        click.secho('Link Timeout', fg='red')
+        error_code = 1
+        return error_code
+    except requests.exceptions.MissingSchema:
+        click.secho('Not a valid URL (perhaps try --parse_file)', fg='red')
+        error_code = 2
+        return error_code
 
 
+# Takes a links passed to it, and determines its status
 @retry(ConnectionError, tries=3, delay=2)
 def link_checker(link):
     try:
         response = requests.head(link)
-        responseString = ""
+        response_string = ''
         if response.status_code == 200:
             click.secho('[GOOD]    ' + link, fg='green')
-            responseString = '[GOOD]    ' + link + '\r\n'
+            response_string = '[GOOD]    ' + link + '\r\n'
         elif response.status_code == 404 or response.status_code == 400:
             click.secho('[BAD]     ' + link, fg='red')
-            responseString = '[BAD]     ' + link + '\r\n'
+            response_string = '[BAD]     ' + link + '\r\n'
         else:
             click.secho('[UNKNOWN] ' + link, fg='white')
-            responseString = '[BAD]     ' + link + '\r\n'
-        return response.status_code, responseString
+            response_string = '[UNKNOWN]     ' + link + '\r\n'
+        return response_string, response.status_code
     except requests.exceptions.ConnectionError:
         click.secho('[ERROR]   ' + link, fg='red')
-        responseString = '[BAD]     ' + link + '\r\n'
-        return responseString
+        response_string = '[ERROR]     ' + link + '\r\n'
+        return response_string
 
 
-@click.command(context_settings={"ignore_unknown_options": True})
-@click.option('--parse_url', is_flag=True, help="Will search the link provided for all broken links")
-@click.option('--parse_file', is_flag=True, help="Will parse the file provided for broken links")
+@click.command(context_settings={'ignore_unknown_options': True})
+@click.option('--parse_url', is_flag=True, help='Will search the link provided for all broken links')
+@click.option('--parse_file', is_flag=True, help='Will parse the file provided for broken links')
 @click.option('--save_file', is_flag=True,
-              help="Will parse the file provided for broken links and save results to text file")
+              help='Will parse the file provided for broken links and save results to a text file')
 @click.argument('link')
 def main(parse_url, parse_file, save_file, link):
     """
@@ -109,34 +129,41 @@ def main(parse_url, parse_file, save_file, link):
     Either provide the single link or the file needing parsing.
     """
     click.clear()
-
     if parse_url:
         link_list = url_parse(link)
-        if not link_list:
-            # click.echo('No links on this page')
-            raise Exception('No links on this page')
-        elif len(link_list) > 1:
-            for link in link_list:
+        if type(link_list) is int:
+            error_code = link_list
+            sys.exit(error_code)
+        elif len(link_list[1]) > 1:
+            for link in link_list[1]:
                 link_checker(link)
         else:
-            link_checker(link_list[0])
+            link_checker(link_list[1])
     elif parse_file or save_file:
-        if save_file:
-            f = open("results.txt", "w+")
-        click.echo("Parsing file later")
-        link_list = file_parse(link)
-        for link in link_list:
-            if str(link) != 'None':
-                result = link_checker(link)
+        try:
+            if save_file:
+                f = open('results.txt', 'w+')
+            link_list = file_parse(link)
+            if type(link_list) is int:
                 if save_file:
-                    f.write(result[1])
-        if save_file:
-            f.close()
-
-
+                    f.close()
+                error_code = link_list
+                sys.exit(error_code)
+            else:
+                for link in link_list:
+                    if str(link) != 'None':
+                        result = link_checker(link)
+                        if save_file:
+                            f.write(result[0])
+                if save_file:
+                    f.close()
+        except FileNotFoundError:
+            click.secho('This file does not exist in the current directory', fg='red')
+            error_code = 3
+            sys.exit(error_code)
     else:
         link_checker(link)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
