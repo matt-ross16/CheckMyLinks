@@ -46,7 +46,6 @@ URL_REGEX = re.compile(
 
 
 def file_parse(filepath):
-    
     link_list = []
     with open(filepath, 'r') as file_object:
         for link in bs4.BeautifulSoup(file_object.read(), "html.parser", parse_only=bs4.SoupStrainer('a')):
@@ -57,21 +56,24 @@ def file_parse(filepath):
 
 def url_parse(base_link):
     link_list = []
-    if link_checker(base_link) == 200:
-        req = urllib.request.Request(base_link, headers={'User-Agent': "Magic-Browser"})
-        page = urlopen(req)
-        html = page.read().decode("utf-8")
-        soup = bs4.BeautifulSoup(html, "html.parser")
-        for link in soup.find_all("a"):
-            if link["href"] == '/':
-                link_list.append(base_link)
-            elif link["href"].startswith("/"):
-                link_list.append(base_link[:-1] + link["href"])
-            elif link["href"].startswith("http"):
-                link_list.append(link["href"])
-            else:
-                link_list.append(base_link + link["href"])
-        return link_list
+    try:
+        if link_checker(base_link) == 200:
+            req = urllib.request.Request(base_link, headers={'User-Agent': "Magic-Browser"})
+            page = urlopen(req)
+            html = page.read().decode("utf-8")
+            soup = bs4.BeautifulSoup(html, "html.parser")
+            for link in soup.find_all("a"):
+                if link["href"] == '/':
+                    link_list.append(base_link)
+                elif link["href"].startswith("/"):
+                    link_list.append(base_link[:-1] + link["href"])
+                elif link["href"].startswith("http"):
+                    link_list.append(link["href"])
+                else:
+                    link_list.append(base_link + link["href"])
+            return link_list
+    except requests.exceptions.ConnectionError:
+        raise Exception('This is not a valid link')
 
 
 @retry(ConnectionError, tries=3, delay=2)
@@ -88,19 +90,20 @@ def link_checker(link):
         else:
             click.secho('[UNKNOWN] ' + link, fg='white')
             responseString = '[BAD]     ' + link + '\r\n'
-        return response.status_code , responseString 
+        return response.status_code, responseString
     except requests.exceptions.ConnectionError:
         click.secho('[ERROR]   ' + link, fg='red')
         responseString = '[BAD]     ' + link + '\r\n'
-        return responseString 
+        return responseString
 
 
 @click.command(context_settings={"ignore_unknown_options": True})
 @click.option('--parse_url', is_flag=True, help="Will search the link provided for all broken links")
 @click.option('--parse_file', is_flag=True, help="Will parse the file provided for broken links")
-@click.option('--save_file', is_flag=True, help="Will parse the file provided for broken links and save results to text file")
+@click.option('--save_file', is_flag=True,
+              help="Will parse the file provided for broken links and save results to text file")
 @click.argument('link')
-def main(parse_url, parse_file, save_file,link):
+def main(parse_url, parse_file, save_file, link):
     """
     A tool used to determine if a link provided is a valid link or not.
     Either provide the single link or the file needing parsing.
@@ -109,15 +112,16 @@ def main(parse_url, parse_file, save_file,link):
 
     if parse_url:
         link_list = url_parse(link)
-        if len(link_list) > 1:
+        if not link_list:
+            # click.echo('No links on this page')
+            raise Exception('No links on this page')
+        elif len(link_list) > 1:
             for link in link_list:
                 link_checker(link)
-        elif len(link_list) == 1:
-            link_checker(link_list[0])
         else:
-            click.echo("No links on this page")
+            link_checker(link_list[0])
     elif parse_file or save_file:
-        if save_file: 
+        if save_file:
             f = open("results.txt", "w+")
         click.echo("Parsing file later")
         link_list = file_parse(link)
@@ -126,7 +130,7 @@ def main(parse_url, parse_file, save_file,link):
                 result = link_checker(link)
                 if save_file:
                     f.write(result[1])
-        if save_file: 
+        if save_file:
             f.close()
 
 
