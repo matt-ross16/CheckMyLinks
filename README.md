@@ -43,4 +43,8 @@ use the
 ## Features
 
 Based on the link that is passed to the program, either a GOOD,
-BAD, or UNKNOWN designation will be assigned to the link.
+BAD, ERROR, or UNKNOWN designation will be assigned to the link.
+
+Filters can be applied to each query to only output links based on
+the designation it has (GOOD, BAD, or UNKNOWN). If no filters are applied,
+all links will be displayed.
