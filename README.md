@@ -1,3 +1,6 @@
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/matt-ross16/CheckMyLinks.svg)](http://isitmaintained.com/project/matt-ross16/CheckMyLinks "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/matt-ross16/CheckMyLinks.svg)](http://isitmaintained.com/project/matt-ross16/CheckMyLinks "Percentage of issues still open")
+
 # CheckMyLinks
 
 #### A Python based project for checking link status
