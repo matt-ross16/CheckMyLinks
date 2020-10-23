@@ -25,22 +25,27 @@ To start running this app, be sure to do the following:
 This will install all the necessary packages for the project.
 From there, use the following command to check your link!
 
-    python checkMyURL.py <your URL here>
+    python checkMyURL.py <your link here>
 
 If you have a URL you would like searched for broken links, try
-the --parse_URL option:
+the -l or --parse_link option:
 
-    python checkMyURL.py --parse_URL <your URL here>
+    python checkMyURL.py -l <your link here>
 
-And if it's a file you want checked for working links, use the
+    python checkMyURL.py --parse_link <your link here>
+
+And if it's a file you want checked for working links, use the -f or
 --parse_file option:
+
+    python checkMyURL.py -f <your file here>
 
     python checkMyURL.py --parse_file <your file here>
 
 And if it's a file you want checked for working links and save the results for later viewing
-use the
---save_file option:
+use the -s or --save_file option:
 
+    python checkMyURL.py -s <your file here>
+    
     python checkMyURL.py --save_file <your file here>
 
 ## Features
@@ -51,3 +56,30 @@ BAD, ERROR, or UNKNOWN designation will be assigned to the link.
 Filters can be applied to each query to only output links based on
 the designation it has (GOOD, BAD, or UNKNOWN). If no filters are applied,
 all links will be displayed.
+
+For GOOD links, use -g or --good_links:
+
+    python checkMyURL.py -g -l <your link here>
+    
+    python checkMyURL.py --good_links -l <your link here>
+
+
+For BAD links, use -b or --bad_links:
+
+    python checkMyURL.py -b -l <your link here>
+
+    python checkMyURL.py --bad_links -l <your link here>
+
+
+For UNKNOWN links, use -u or --unknown_links:
+
+    python checkMyURL.py -u -l <your link here>
+
+    python checkMyURL.py --unknown_links -l <your link here>
+
+
+For all links, use -a or --all_links:
+
+    python checkMyURL.py -a -l <your link here>
+
+    python checkMyURL.py --all_links -l <your link here>
