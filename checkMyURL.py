@@ -5,24 +5,54 @@ import sys
 from urllib.request import urlopen
 from colorama import init
 import bs4
+import re
 from retry import retry
 
 init()
 
 
 # Takes a file passed to it, and passes the links within to link_checker
-def file_parse(filepath):
+def file_parse(filepath,ignoreLinks):
     link_list = []
     try:
         with open(filepath, 'r') as file_object:
             for link in bs4.BeautifulSoup(file_object.read(), "html.parser", parse_only=bs4.SoupStrainer('a')):
-                if link.has_attr('href'):
+                linkIgnored = False
+                for iLink in ignoreLinks:
+                    if len(re.findall(iLink,str(link))) != 0: 
+                        linkIgnored = True
+                if link.has_attr('href') and linkIgnored == False:
                     link_list.append(link['href'])
         return link_list
     except OSError:
         click.secho('Not a valid file (perhaps try --parse_url)', fg='red')
         error_code = 5
         return error_code
+
+
+# Takes a file passed to it, and returns the links contained 
+def ignore_parse(filepath):
+    try:
+        fileText = open(filepath, 'r').read()
+        fileComments = set(re.findall('#.*', fileText))
+        fileUrl = set(re.findall('(?!# )(http|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?', fileText))
+        fileInvalidUrl = set(re.findall('(?!# )(?!http|https)(?!://)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?', fileText))
+        if fileUrl:
+            fileLink = [(url[0]+"://" + url[1] + url[2]) for url in fileUrl]
+            return fileLink
+        elif fileInvalidUrl:
+            click.secho("The URL provided is invalid. Must begin with https:// or http://",fg='red')
+            error_code = 5
+            sys.exit(error_code)
+    except FileNotFoundError as e:
+        click.secho('This file does not exist in the current directory', fg='red')
+        error_code = 3
+        sys.exit(error_code)
+    except IOError as e:
+        click.secho('This file could not be opened', fg='red')
+        error_code = 3
+        sys.exit(error_code)
+    
 
 
 # Takes a link passed to it, and scrapes the webpage for links
@@ -102,8 +132,10 @@ def link_checker(link, link_filter):
               help='Filter links by only showing UNKNOWN ones')
 @click.option('-a', '--all_links', 'link_filter', flag_value='all', default=True,
               help='Show all links')
+@click.option('-i', '--ignore', type=str,
+              help='Use file to filter out unwanted URLS')
 @click.argument('link')
-def main(parse_link, parse_file, save_file, link_filter, link):
+def main(parse_link, parse_file, save_file, link_filter, ignore, link):
     """
     A tool used to determine if a link provided is a valid link or not.
     Either provide the single link or the file needing parsing.
@@ -124,11 +156,14 @@ def main(parse_link, parse_file, save_file, link_filter, link):
             link_checker(link_list[0], link_filter)
         else:
             link_checker(link_list[1])
-    elif parse_file or save_file:
+    elif parse_file or save_file or ignore:
         try:
+            ignoreLinks = []
             if save_file:
                 file = open('results.txt', 'w+')
-            link_list = file_parse(link)
+            if ignore: 
+                ignoreLinks = ignore_parse(ignore)
+            link_list = file_parse(link,ignoreLinks)
             if type(link_list) is int:
                 if save_file:
                     file.close()

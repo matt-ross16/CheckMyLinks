@@ -20,6 +20,7 @@ index2.html
 <a href="http://zenit.senecac.on.ca/~chris.tyler/planet/">http://zenit.senecac.on.ca/~chris.tyler/planet/</a>
 <a href="http://www.wordpress.com">http://www.wordpress.com</a>
 <a href="http://s9y.org">http://s9y.org</a>
+<a href="https://www.google.com/search?safe=active&sxsrf=ALeKk00adHyZi_zS4oNr1CTH5gkSFhD4FA%3A1604138558133&source=hp&ei=PjadX7O-Baak_Qbrrr3IDw&q=td&oq=td&gs_lcp=CgZwc3ktYWIQAzIECCMQJzIKCC4QxwEQowIQJzIICAAQsQMQgwEyBQgAEMkDMgUIABCSAzIFCAAQkgMyBQguELEDMgUIABCxAzIFCAAQsQMyCAgAELEDEIMBOgcIIxDqAhAnOg0ILhDHARCjAhDqAhAnOgQILhAnOgUIABCRAjoICC4QsQMQgwFQwx1YtyBgoCFoAXAAeACAAWaIAb0BkgEDMS4xmAEAoAEBqgEHZ3dzLXdperABCg&sclient=psy-ab&ved=0ahUKEwiz1bPnyd7sAhUmUt8KHWtXD_kQ4dUDCAk&uact=5">http://s9y.org</a>
 <a href="http://en.wikipedia.org/wiki/RSS_(file_format)">http://en.wikipedia.org/wiki/RSS_(file_format)</a>
 <a href="http://en.wikipedia.org/wiki/RSS_(file_format)">http://en.wikipedia.org/wiki/RSS_(file_format)</a>
 <a href="http://en.wikipedia.org/wiki/Hackergotchi">http://en.wikipedia.org/wiki/Hackergotchi</a>
