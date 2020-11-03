@@ -18,9 +18,10 @@ def file_parse(filepath,ignoreLinks):
         with open(filepath, 'r') as file_object:
             for link in bs4.BeautifulSoup(file_object.read(), "html.parser", parse_only=bs4.SoupStrainer('a')):
                 linkIgnored = False
-                for iLink in ignoreLinks:
-                    if len(re.findall(iLink,str(link))) != 0: 
-                        linkIgnored = True
+                if ignoreLinks:
+                    for iLink in ignoreLinks:
+                        if len(re.findall(iLink,str(link))) != 0: 
+                            linkIgnored = True
                 if link.has_attr('href') and linkIgnored == False:
                     link_list.append(link['href'])
         return link_list
