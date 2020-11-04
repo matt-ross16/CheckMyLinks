@@ -35,7 +35,6 @@ def file_parse(filepath,ignoreLinks):
 def ignore_parse(filepath):
     try:
         fileText = open(filepath, 'r').read()
-        fileComments = set(re.findall('#.*', fileText))
         fileUrl = set(re.findall('(?!# )(http|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?', fileText))
         fileInvalidUrl = set(re.findall('(?!# )(?!http|https)(?!://)([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?', fileText))
         if fileUrl:
