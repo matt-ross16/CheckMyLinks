@@ -83,3 +83,8 @@ For all links, use -a or --all_links:
     python checkMyURL.py -a -l <your link here>
 
     python checkMyURL.py --all_links -l <your link here>
+
+If you would link to include a file containing links to ignore: 
+  
+    python checkMyURL.py  <your file here> -i <your ignore file here>
+Note: the ignore file should be formatted with only comments and http:// or https:// links
