@@ -8,11 +8,12 @@ import bs4
 import re
 from retry import retry
 
+
 init()
 
 
 # Takes a file passed to it, and passes the links within to link_checker
-def file_parse(filepath,ignoreLinks):
+def file_parse(filepath, ignoreLinks):
     link_list = []
     try:
         with open(filepath, 'r') as file_object:
@@ -52,7 +53,29 @@ def ignore_parse(filepath):
         click.secho('This file could not be opened', fg='red')
         error_code = 3
         sys.exit(error_code)
-    
+
+
+# Parses Telescope blog posts for link status
+@retry(ConnectionError, tries=3, delay=2)
+def telescope_parse(link_filter):
+    # Can also use the Telescope API: 'https://telescope.cdot.systems/posts/'
+    base_link = 'http://localhost:3000/posts/'
+    link_list = []
+    try:
+        req = requests.get(base_link, verify=False)
+        if (req.status_code != 200):
+            click.secho('Not a valid URL')
+        else:
+            json = req.json()
+            for post in json:
+                id = post.get('id')
+                click.secho(id)
+                url = base_link + id
+                click.secho(url)
+                link_list.append(url)
+            return link_list
+    except requests.exceptions.SSLError:
+        click.secho('An SSL has been encountered', fg='red')
 
 
 # Takes a link passed to it, and scrapes the webpage for links
@@ -73,7 +96,8 @@ def link_parse(base_link, link_filter):
                 elif link['href'].startswith('http'):
                     link_list.append(link['href'])
                 else:
-                    link_list.append(base_link + link['href'])
+                    format_link = link['href']
+                    link_list.append(format_link[2:-2])
             return error_code, link_list
         else:
             click.secho('This link is broken', fg='red')
@@ -115,6 +139,26 @@ def link_checker(link, link_filter):
             click.secho('[ERROR]   ' + link, fg='red')
             response_string = '[ERROR]   ' + link + '\r\n'
         return response_string, status_code
+    except requests.exceptions.MissingSchema:
+        response_string = ''
+        status_code = 400
+        if link_filter == 'bad' or link_filter == 'all':
+            click.secho('[ERROR]   ' + link, fg='red')
+            response_string = '[ERROR]   ' + link + '\r\n'
+        return response_string, status_code
+
+
+def list_checker(list, link_filter):
+    if type(list) is int:
+        error_code = list
+        sys.exit(error_code)
+    elif len(list[1]) > 1:
+        for link in list[1]:
+            link_checker(link, link_filter)
+    elif len(list) == 1:
+        link_checker(list[0], link_filter)
+    #else:
+        #link_checker(list[1], link_filter)
 
 
 @click.command(context_settings={'ignore_unknown_options': True})
@@ -134,8 +178,10 @@ def link_checker(link, link_filter):
               help='Show all links')
 @click.option('-i', '--ignore', type=str,
               help='Use file to filter out unwanted URLS')
+@click.option('-t', '--telescope', 'telescope', is_flag=True,
+              help='Search the 10 most recent posts to Telescope for URLs')
 @click.argument('link')
-def main(parse_link, parse_file, save_file, link_filter, ignore, link):
+def main(parse_link, parse_file, save_file, link_filter, ignore, telescope, link):
     """
     A tool used to determine if a link provided is a valid link or not.
     Either provide the single link or the file needing parsing.
@@ -146,22 +192,13 @@ def main(parse_link, parse_file, save_file, link_filter, ignore, link):
     click.clear()
     if parse_link:
         link_list = link_parse(link, link_filter)
-        if type(link_list) is int:
-            error_code = link_list
-            sys.exit(error_code)
-        elif len(link_list[1]) > 1:
-            for link in link_list[1]:
-                link_checker(link, link_filter)
-        elif len(link_list) == 1:
-            link_checker(link_list[0], link_filter)
-        else:
-            link_checker(link_list[1])
+        list_checker(link_list, link_filter)
     elif parse_file or save_file or ignore:
         try:
             ignoreLinks = []
             if save_file:
                 file = open('results.txt', 'w+')
-            if ignore: 
+            if ignore:
                 ignoreLinks = ignore_parse(ignore)
             link_list = file_parse(link,ignoreLinks)
             if type(link_list) is int:
@@ -182,6 +219,11 @@ def main(parse_link, parse_file, save_file, link_filter, ignore, link):
             click.secho('This file does not exist in the current directory', fg='red')
             error_code = 3
             sys.exit(error_code)
+    elif telescope:
+        telescope_list = telescope_parse(link_filter)
+        for link in telescope_list:
+            link_list = link_parse(link, link_filter)
+            list_checker(link_list, link_filter)
     else:
         link_checker(link, link_filter)
 
