@@ -9,21 +9,7 @@ For those times when you aren't sure if the link you have on hand
 actually exists, plug it into this handy tool and you will find the
 answer quickly!
 
-## Prerequisites
-
-Before you begin, ensure that you have downloaded and installed Python to your
-machine:
-
-    https://www.python.org/downloads/
-
-## Installation
-
-To start running this app, be sure to do the following:
-
-    pip3 install --editable .
-
-This will install all the necessary packages for the project.
-From there, use the following command to check your link!
+Use the following command to check your link!
 
     python checkMyURL.py <your link here>
 
@@ -87,4 +73,11 @@ For all links, use -a or --all_links:
 If you would link to include a file containing links to ignore: 
   
     python checkMyURL.py  <your file here> -i <your ignore file here>
+    
 Note: the ignore file should be formatted with only comments and http:// or https:// links
+
+To run the link checker against the Telescope API, use:
+
+    python checkMyURL.py -t -a .
+
+Note: the period is used as a placeholder for a filename.
