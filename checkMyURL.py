@@ -59,19 +59,18 @@ def ignore_parse(filepath):
 @retry(ConnectionError, tries=3, delay=2)
 def telescope_parse(link_filter):
     # Can also use the Telescope API: 'https://telescope.cdot.systems/posts/'
+    # base_link = 'https://telescope.cdot.systems/posts/'
     base_link = 'http://localhost:3000/posts/'
     link_list = []
     try:
-        req = requests.get(base_link, verify=False)
+        req = requests.get(base_link)
         if (req.status_code != 200):
             click.secho('Not a valid URL')
         else:
             json = req.json()
             for post in json:
                 id = post.get('id')
-                click.secho(id)
                 url = base_link + id
-                click.secho(url)
                 link_list.append(url)
             return link_list
     except requests.exceptions.SSLError:
@@ -157,8 +156,6 @@ def list_checker(list, link_filter):
             link_checker(link, link_filter)
     elif len(list) == 1:
         link_checker(list[0], link_filter)
-    #else:
-        #link_checker(list[1], link_filter)
 
 
 @click.command(context_settings={'ignore_unknown_options': True})
