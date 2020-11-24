@@ -1,0 +1,23 @@
+[tool.black]
+line-length = 88
+include = '\.pyi?$'
+exclude = '''
+
+(
+  /(
+    | .flake8
+    | CONTRIBUTING.md
+    | ignoreComment.txt
+    | ignoreCommentandURK.txt
+    | ignoreInvalid.txt
+    | ignoreURL.txt
+    | LICENSE.md
+    | links.txt
+    | lint.sh
+    | pretty.sh
+    | pyproject.toml
+    | README.md
+    | setup.py
+  )/
+)
+'''
