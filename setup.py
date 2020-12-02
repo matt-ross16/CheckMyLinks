@@ -6,5 +6,5 @@ setup(
     description='A link checker',
     author='Matthew Ross',
     author_email='mross20@myseneca.ca',
-    install_requires=['click', 'requests', 'colorama', 'bs4', 'retry']
+    install_requires=['click', 'requests', 'colorama', 'bs4', 'retry', 'black', 'flake8']
 )
